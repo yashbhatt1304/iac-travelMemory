@@ -1,0 +1,29 @@
+- hosts: frontend
+  become: yes
+  tasks: 
+    - name: Install Libraries and Travel Memory Frontend
+      shell: |
+        sudo apt update -y && sudo apt install -y nginx && sudo apt install -y docker
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+	      sudo apt install -y nodejs
+	      docker pull yashbbhatt/travel_memory_frontend
+
+- hosts: backend
+  become: yes
+  tasks:
+    - name: Install Libraries and Travel Memory Backend
+      shell: |
+        sudo apt update -y && sudo apt install -y nginx && sudo apt install -y docker
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt install -y nodejs
+        docker pull yashbbhatt/travel_memory_backend
+
+- hosts: database
+  become: yes
+  tasks:
+    - name: Install Libraries and Travel Memory Database
+      shell: |
+        sudo apt update -y && sudo apt install -y nginx && sudo apt install -y docker
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt install -y nodejs
+        docker pull mongo
