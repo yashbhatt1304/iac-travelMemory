@@ -35,7 +35,7 @@ output "tm-security-group" {
 
 output "tm-ec2-instance" {
     description = "EC2 for Travel Memory"
-    value = aws_instance.tm-ec2.id
+    value = aws_instance.tm_ec2.id
 }
 
 output "tm-launch-template" {

@@ -28,7 +28,7 @@ resource "aws_default_network_acl" "tm_nacl" {
     protocol = -1
     rule_no = 100
     action = "allow"
-    cidr_block = "0.0.0.0"
+    cidr_block = "0.0.0.0/0"
     from_port = 0
     to_port = 0
   }
@@ -37,7 +37,7 @@ resource "aws_default_network_acl" "tm_nacl" {
     protocol = -1
     rule_no = 100
     action = "allow"
-    cidr_block = "0.0.0.0"
+    cidr_block = "0.0.0.0/0"
     from_port = 0
     to_port = 0
   }
@@ -83,8 +83,9 @@ resource "aws_internet_gateway" "tm_igw" {
 ###### Travel Memory Route Table ######
 resource "aws_route_table" "tm_route_table" {
   vpc_id = aws_vpc.tm_vpc.id
-  route = {
-    cidr_block = "0.0.0.0"
+
+  route {
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.tm_igw.id
   }
 
@@ -163,7 +164,7 @@ resource "aws_autoscaling_group" "tm_autoscaling_group" {
   }
 
   instance_maintenance_policy {
-    max_healthy_percentage = 90
+    max_healthy_percentage = 110
     min_healthy_percentage = 70
   }
 }
