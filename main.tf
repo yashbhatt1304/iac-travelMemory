@@ -100,7 +100,7 @@ resource "aws_route_table_association" "tm_route_table_assocation" {
   route_table_id = aws_route_table.tm_route_table.id
 }
 
-###### Security Group ######
+###### Travel Memory Security Group ######
 resource "aws_security_group" "tm_security_group" {
   vpc_id = aws_vpc.tm_vpc.id
 
@@ -129,4 +129,61 @@ resource "aws_security_group" "tm_security_group" {
     Name = "tm-security-group"
     AppName = var.TravelMemoryApp
   }
+}
+
+###### Travel Memory Instance ######
+resource "aws_instance" "tm_ec2" {
+  ami = var.ImageId
+  instance_type = var.instanceType
+
+  tags = {
+    Name = "tm-ec2"
+    AppName = var.TravelMemoryApp
+  }
+}
+
+###### Travel Memory Launch Template ######
+resource "aws_launch_template" "tm_launch_template" {
+  image_id = var.ImageId
+  instance_type = var.instanceType
+}
+
+##### Travel Memory ASG #####
+resource "aws_autoscaling_group" "tm_autoscaling_group" {
+  availability_zones = ["ap-northeast-2a"]
+  desired_capacity = 3
+  max_size = 3
+  min_size = 1
+  health_check_type = "ELB"
+  health_check_grace_period = 300
+  
+  launch_template {
+    id = aws_launch_template.tm_launch_template.id
+    version = "$Latest"
+  }
+
+  instance_maintenance_policy {
+    max_healthy_percentage = 90
+    min_healthy_percentage = 70
+  }
+}
+
+##### Travel Memory Load Balancer #####
+resource "aws_lb" "tm_load_balancer" {
+    name = "tm-load-balancer"
+    load_balancer_type = "application"
+    enable_deletion_protection = true
+    security_groups = aws_security_group.tm_security_group.id
+    subnets = aws_subnet.tm_pub_subnet
+
+    tags = {
+      Name = "tm-load-balancer"
+      AppName = var.TravelMemoryApp
+    }
+}
+
+###### Attaching Load Balancer to Auto-Scaling group #######
+resource "aws_autoscaling_attachment" "tm_autoscaling_attachement" {
+  autoscaling_group_name = aws_autoscaling_group.tm_autoscaling_group.id
+  elb = aws_lb.tm_load_balancer.id
 }
